@@ -30,7 +30,19 @@ function processIncludes(inputFile, input, cb) {
   if (incCount === 0) cb(null, input);
   includes.forEach(function(include) {
     var fname = include.replace(/^@include\s+/, '');
-    if (!fname.match(/\.md$/)) fname += '.md';
+
+    // find .md (v0.10.x, v0.12.x) or .markdown (<v4) files
+    if (!fname.match(/(\.md|\.markdown)$/)) {
+      try {
+        var fullFname = path.resolve(path.dirname(inputFile), fname + ".md");
+        fs.accessSync(fullFname);
+        fname += ".md";
+      }
+      catch (err)
+      {
+        fname += ".markdown";
+      }
+    }
 
     if (includeData.hasOwnProperty(fname)) {
       input = input.split(include).join(includeData[fname]);
