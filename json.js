@@ -18,6 +18,11 @@ renderer.link = function(href, title, text)
   return text;
 };
 renderer.code = function(text, language) {
+  // replace stability warnings with nicer text
+  if (/^Stability/.test(text)) {
+    return "<div class='stability-warning'>" + text.replace(/\[`/g, '<code>').replace(/`]\[]/g, '</code>') + "</div>";
+  }
+
   var classes = language ? (" class=\"lang-" + language) + "\"" : "";
   return "<pre><code" + classes + ">" + require('highlight.js').highlightAuto(text, [language, "js"]).value + "</code></pre>";
 }
