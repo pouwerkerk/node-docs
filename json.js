@@ -17,12 +17,13 @@ renderer.link = function(href, title, text)
 {
   return text;
 };
+renderer.code = function(text, language) {
+  var classes = language ? (" class=\"lang-" + language) + "\"" : "";
+  return "<pre><code" + classes + ">" + require('highlight.js').highlightAuto(text, [language, "js"]).value + "</code></pre>";
+}
 
 marked.setOptions({
-  renderer: renderer,
-  highlight: function(code) {
-    return require('highlight.js').highlightAuto(code).value;
-  }
+  renderer: renderer
 });
 
 function doJSON(input, filename, cb) {
