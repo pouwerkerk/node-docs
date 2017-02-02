@@ -10,6 +10,7 @@ const R = require("ramda");
 
 const BASE_PATH = "../node/doc/api";
 const OUTPUT_PATH = "output";
+const SORT_KEYS = true;
 
 var fileName = process.argv[2] || "output.json";
 var files = fs.readdirSync(BASE_PATH);
@@ -57,6 +58,17 @@ Promise.map(files, function (aFileName)
     {
         return Object.assign(accum, next)
     }, { });
+}).then(function (aResult)
+{
+    if (SORT_KEYS) {
+        var result = {};
+        var sortedKeys = Object.keys(aResult).sort();
+        sortedKeys.forEach(function(key) {
+            result[key] = aResult[key];
+        });
+        return result;
+    }
+    return aResult;
 }).then(function (aResult)
 {
     var destination = path.join(OUTPUT_PATH, fileName);
