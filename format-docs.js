@@ -10,6 +10,7 @@ const R = require("ramda");
 
 const BASE_PATH = "docs";
 const OUTPUT_PATH = "output";
+const SORT_KEYS = true;
 
 var fileName = process.argv[2] || "output.json";
 var files = fs.readdirSync(BASE_PATH);
@@ -29,13 +30,28 @@ function render(file) {
         .catch(err => { console.log("ERROR", err); });
 }
 
+function sortKeys(aJSON)
+{
+    if (SORT_KEYS) {
+        var result = {};
+        var sortedKeys = Object.keys(aJSON).sort();
+        sortedKeys.forEach(function(key) {
+            result[key] = aJSON[key];
+        });
+        return result;
+    }
+    return aJSON;
+}
+
 var every = { };
 Promise.map(files, function (aFileName)
 {
     let inputFile = path.join(BASE_PATH, aFileName);
-    return fs.readFileAsync(inputFile, 'utf8').then(function (aJSON)
+    return fs.readFileAsync(inputFile, 'utf8')
+    .then(JSON.parse)
+    .then(sortKeys)
+    .then(function (aJSON)
     {
-        console.log("Parsing " + aFileName);
-        fs.writeFileSync(path.join("output", aFileName), JSON.stringify(JSON.parse(aJSON), null, 2), "utf8");
+        fs.writeFileSync(path.join("output", aFileName), JSON.stringify(aJSON, null, 2), "utf8");
     })
 });
